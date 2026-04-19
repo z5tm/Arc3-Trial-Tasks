@@ -2,28 +2,37 @@ using System.Collections.Generic;
 using LabApi.Events.Arguments.PlayerEvents;
 using MEC;
 
-namespace z5tmsfirstitmesolelyusinglabapi;
+namespace ImmersionMod.Functions;
 
-public class AdrenalineRush
+public static class AdrenalineRush
 {
-    public static HashSet<ReferenceHub>? NotReady;
+    private static HashSet<ReferenceHub>? _notReady;
     public static HashSet<RecyclablePlayerId>? IsActive;
     public static Dictionary<ReferenceHub, int>? CoolDowners; // referencehub, cooldowntime
     
     private static List<CoroutineHandle>? _waiters;
     public static void Adrenaline(PlayerHurtEventArgs ev)
     {
-        NotReady ??= [];
-        if (!(ev.Player.Health <= ev.Player.MaxHealth * 0.25) || NotReady.Contains(ev.Player.ReferenceHub) || !ev.Player.IsAlive || ev.Player.IsDestroyed || ev.Player.Health == 0) return; // ezpz logic.
+        _notReady ??= [];
+        if (
+            !(ev.Player?.Health <= ev.Player?.MaxHealth * 0.25) 
+            || _notReady.Contains(ev.Player.ReferenceHub) 
+            || !ev.Player.IsAlive 
+            || ev.Player.IsDestroyed 
+            || ev.Player.Health == 0
+            )
+            return;
+        
         ev.Player.SendHint("<color=orange>[</color><color=red>ADRENALINE RUSH</color><color=orange>]</color>", 5);
-        ev.Player.EnableEffect<CustomPlayerEffects.Invigorated>(1, 5, true); // i hope that's the right one?!?!?!
+        ev.Player.EnableEffect<CustomPlayerEffects.Invigorated>(1, 5, true);
+        
         _waiters ??= new List<CoroutineHandle>();
         _waiters.Add(Timing.RunCoroutine(WaitFor30Seconds(ev.Player.ReferenceHub)));
     }
 
     private static IEnumerator<float> WaitFor30Seconds(ReferenceHub user) // "what is my purpose?" "you wait for 30 seconds" "oh my god.."
     {
-        NotReady ??= []; NotReady.Add(user);
+        _notReady ??= []; _notReady.Add(user);
         IsActive ??= []; IsActive.Add(user._playerId); // i loove you reference hubb
         CoolDowners ??= new Dictionary<ReferenceHub, int>();
         yield return Timing.WaitForSeconds(5.0f);
@@ -37,13 +46,13 @@ public class AdrenalineRush
             CoolDowners[name] = i; // replace the value (cd) using the key (name) !!!
             yield return Timing.WaitForSeconds(1.0f);
         }
-        if (user != null) NotReady.Remove(user);
+        if (user != null) _notReady.Remove(user);
         // ReSharper restore ConditionIsAlwaysTrueOrFalse
-    } // i do NOT believe you SL, user can 100% be null lol
+    } // I do NOT believe you SL, user's referencehub can probably be null
 
     public static void Reset()
     {
-        NotReady?.Clear();
+        _notReady?.Clear();
         if (_waiters == null) return;
         
         Timing.KillCoroutines(_waiters.ToArray());

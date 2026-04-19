@@ -5,21 +5,15 @@ using EasyTmp;
 using JetBrains.Annotations;
 using LabApi.Features.Wrappers;
 
-namespace z5tmsfirstitmesolelyusinglabapi.Commands;
-
-public static class UserInfo
-{
-    public static Dictionary<string, string>? GenderPreferences { get; set; } // userid, m/n/f // male, neutral, female
-}
-
+namespace ImmersionMod.Commands;
 
 [UsedImplicitly]
 [CommandHandler(typeof(ClientCommandHandler))]
-public class GenderSet : ICommand
+public class SetGender : ICommand
 {
-    string ICommand.Command => "gender";
+    string ICommand.Command => "setgender";
 
-    string[] ICommand.Aliases => ["gs", "genderset"];
+    string[] ICommand.Aliases => ["gs", "genderset", "gender"];
 
     string ICommand.Description => "Choose your gender preference! `.gender m` for male, `.gender f` for female, and `.gender n` for gender-neutral!";
 
@@ -36,13 +30,13 @@ public class GenderSet : ICommand
         if (plr.DoNotTrack)
         {
             response =
-                "<color=orange>This feature is not availablee for players with</color> <color=blue>DoNotTrack</color> <color=orange>due to the requirement of extra logic.</color>";
+                "<color=orange>This feature is not available for players with</color> <color=blue>DoNotTrack</color> <color=orange>. The data is stored longer than one round, and it is not vital in any sense.</color>";
             return false;
         }
 
         if (arguments.Count != 1)
         {
-            response = EasyArgs.Build().CmdArguments("gender male/female/neutral").Done();
+            response = EasyArgs.Build().CmdArguments(".gender male/female/neutral").Done();
             return false;
         }
 
@@ -63,11 +57,16 @@ public class GenderSet : ICommand
                 UserInfo.GenderPreferences[plr.UserId] = "n";
                 break;
             default:
-                response = EasyArgs.Build().CmdArguments("gender male/female/neutral").Done();
+                response = EasyArgs.Build().CmdArguments(".gender male/female/neutral").Done();
                 return false;
         }
 
         response = "<color=green>Success</color><color=orange>! Your pronoun preferences have been set.</color>";
         return true;
     }
+}
+
+public static class UserInfo
+{
+    public static Dictionary<string, string>? GenderPreferences { get; set; } // userid, m/n/f // male, neutral, female
 }

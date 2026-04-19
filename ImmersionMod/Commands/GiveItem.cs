@@ -5,16 +5,15 @@ using JetBrains.Annotations;
 using LabApi.Features.Console;
 using LabApi.Features.Wrappers;
 
-namespace z5tmsfirstitmesolelyusinglabapi.Commands;
+namespace ImmersionMod.Commands;
 
 [UsedImplicitly]
 [CommandHandler(typeof(RemoteAdminCommandHandler))]
-public class GivePlayerEpicItem : ICommand
+public class GiveItem : ICommand
 {
     public string Command { get; } = "z5give";
     public string[] Aliases { get; } = ["z5g"];
     public string Description { get; } = "GivePlayersItem";
-    // private string Usage { get; } = EasyArgs.Build().CmdArguments("give opt-userid itemid").Done();
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
         var plr = Player.Get(sender);
@@ -54,25 +53,29 @@ public class GivePlayerEpicItem : ICommand
                         response = $"<color=green>Success</color><color=orange>!</color> <color=blue>{(ItemType)itemId}</color> <color=orange>has been given.</color>";
                         return true;
                     }
-                    else
-                    {
-                        response = "<color=red>Failure</color><color=orange>. User's inventory is</color> <color=red>full</color><color=orange>.</color>";
-                        return false;
-                    }
+                    response = "<color=red>Failure</color><color=orange>. User's inventory is</color> <color=red>full</color><color=orange>.</color>";
+                    return false;
                 }
                 // condition 2: user wants to give somebody an item !
                 case 2:
                 {
                     int.TryParse(arguments.At(0), out var playerId);
                     int.TryParse(arguments.At(1), out var itemId);
+                    
                     var plrToGive = Player.Get(playerId);
                     if (plrToGive == null)
                     {
-                        response = $"<color=red>Error!</color>\n<color=orange>Player at ID</color> <color=blue>{playerId}</color><color=orange> was</color> <color=red>null</color><color=orange>.</color>";
+                        response = $"<color=red>Error!</color> <color=orange>ID ({playerId}) was</color> <color=red>null</color><color=orange>.</color> ";
                         return false;
                     }
-                    if (!plrToGive.IsInventoryFull)
-                        plrToGive.AddItem((ItemType)itemId);
+
+                    if (plrToGive.IsInventoryFull)
+                    {
+                        response = $"<color=red>Error!</color> <color=orange>\"{plrToGive.Nickname}\" ({plrToGive.PlayerId})'s inventory was full.</color> ";
+                        return false;
+                    }
+                    
+                    plrToGive.AddItem((ItemType)itemId);
                     response = $"<color=green>Success</color><color=orange>!</color> <color=blue>{(ItemType)itemId}</color> <color=orange>has been given to</color> <color=blue>{plrToGive.DisplayName}</color><color=orange>!</color>";
                     return true;
                 }
@@ -87,13 +90,13 @@ public class GivePlayerEpicItem : ICommand
         catch (NullReferenceException e)
         {
             Logger.Error($"NullReferenceException: {e.Message}"); // so useful!
-            response = !z5tm.Instance.Config.AllowStaffExceptionRead ? "<color=orange>One of the values provided ended up being</color> <color=red>null</color><color=orange>. Please ask the server administrators to either enable</color> <color=blue>AllowStaffExceptionRead</color> <color=orange>to read the error, or check the game console. </color>" : $"<color=red>NullReferenceException</color><color=orange> caused by one of the provided values.</color>\n{e.Message}";
+            response = !Plugin.Instance.Config.AllowStaffExceptionRead ? "<color=orange>One of the values provided ended up being</color> <color=red>null</color><color=orange>. Please ask the server administrators to either enable</color> <color=blue>AllowStaffExceptionRead</color> <color=orange>to read the error, or check the game console. </color>" : $"<color=red>NullReferenceException</color><color=orange> caused by one of the provided values.</color>\n{e.Message}";
             return false;
         }
         catch (Exception e)
         {
             Logger.Debug($"Exceptioon! \"{e.Message}\"");
-            response = !z5tm.Instance.Config.AllowStaffExceptionRead ? "<color=orange>One of the values provided ended up in an</color> <color=red>exception</color><color=orange>. Please ask the server administrators to either enable</color> <color=blue>AllowStaffExceptionRead</color> <color=orange>to read the error, or check the game console. </color>" : $"<color=red>Exception</color><color=orange>, likely caused by one of the provided values.</color>\n{e.Message}";
+            response = !Plugin.Instance.Config.AllowStaffExceptionRead ? "<color=orange>One of the values provided ended up in an</color> <color=red>exception</color><color=orange>. Please ask the server administrators to either enable</color> <color=blue>AllowStaffExceptionRead</color> <color=orange>to read the error, or check the game console. </color>" : $"<color=red>Exception</color><color=orange>, likely caused by one of the provided values.</color>\n{e.Message}";
             return false;
         }
     }

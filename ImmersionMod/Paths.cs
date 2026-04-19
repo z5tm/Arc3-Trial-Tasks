@@ -2,7 +2,7 @@ using System.IO;
 using LabApi.Features.Wrappers;
 using LabApi.Loader.Features.Paths;
 
-namespace z5tmsfirstitmesolelyusinglabapi;
+namespace ImmersionMod;
 
 public static class Paths // no reason for these to be private by the way, freely change future developers !!!!!!
 {
@@ -13,6 +13,6 @@ public static class Paths // no reason for these to be private by the way, freel
     // public static string InstanceConfig => Path.Combine(ConfigPort, z5tm.Instance.Name); // so we don't have to reset it later ! also static property cuz it uses one. it's kinda like gpl 3.0 !
     // public static string Names => Path.Combine(InstanceConfig, "Names");
     // public static string ConfigPath => PathManager.Configs.FullName;
-    public static string Names => Path.Combine(PathManager.Configs.FullName, Server.Port.ToString(), z5tm.Instance.Name, "Names");
-    public static string Pronouns => Path.Combine(PathManager.Configs.FullName, Server.Port.ToString(), z5tm.Instance.Name, "Pronouns");
+    public static string Names => Path.Combine(PathManager.Configs.FullName, Server.Port.ToString(), Plugin.Instance.Name, "Names");
+    public static string Pronouns => Path.Combine(PathManager.Configs.FullName, Server.Port.ToString(), Plugin.Instance.Name, "Pronouns");
 }

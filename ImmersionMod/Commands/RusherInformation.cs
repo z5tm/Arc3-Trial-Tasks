@@ -1,31 +1,40 @@
 using System;
 using CommandSystem;
 using EasyTmp;
+using ImmersionMod.Functions;
+using JetBrains.Annotations;
 using LabApi.Features.Wrappers;
 
-namespace z5tmsfirstitmesolelyusinglabapi.Commands;
+namespace ImmersionMod.Commands;
 
+[UsedImplicitly] // love you rider
 [CommandHandler(typeof(RemoteAdminCommandHandler))]
-public class CheckEpicAdrenalineUsers : ICommand
+public class RusherInformation : ICommand
 {
-    // foreach check on notready comp. to player.readylist
-    
     public string Command { get; } = "r";
-    public string[] Aliases { get; } = ["rushin", "rushers", "rush"];
-    public string Description { get; } = "Check Adrenaline Rushers Info!";
-    // private List<ReferenceHub>? _listOfPlayers;
+    public string[] Aliases { get; } = ["rushin", "rushers", "rush", "rusherinformation"];
+    public string Description { get; } = "[ImmersionMod] Information regarding AdrenalineRushers.!";
     
-
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
-        if (!Player.Get(sender)?.RemoteAdminAccess ?? true)
+        var player = Player.Get(sender);
+        if (player == null)
         {
-            response = "<color=red>ERROR:</color> <color=orange>no RA or no player.</color>";
+            response = EasyArgs.Build()
+                .Red("FAILURE:")
+                .Space().Orange("Player was null.")
+                .Done();
             return false;
         }
-        // _listOfPlayers ??= [];
-        // var listOfPlayers = _listOfPlayers;
-        // listOfPlayers.AddRange(from plr in Player.ReadyList where !AdrenalineRush.NotReady?.Contains(plr.ReferenceHub) ?? true select plr.ReferenceHub);
+        
+        if (!player.RemoteAdminAccess)
+        {
+            response = EasyArgs.Build()
+                .Red("FAILURE:")
+                .Space().Orange("No RA permission.")
+                .Done();
+            return false;
+        }
 
         var responseBuilder = EasyArgs.Build().Blue("AdrenallineInfo:");
         foreach (var plr in Player.ReadyList)
