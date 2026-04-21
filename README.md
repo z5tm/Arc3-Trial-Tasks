@@ -8,4 +8,4 @@
 | Give Item         | `z5g`            | Gives the user an item, with an optional ID. Generally useless.                                                                     |
 
 
-**This code is mainly meant to be stolen from, and to teach others. This is not necessarily meant for an actual roleplay environment, if you would like a real generalized roleplay plugin, please check out my plugin [here](https://github.com/z5tm/General-Roleplay-Plugin).
+**This code is mainly meant to be stolen from, and to teach others. This is not necessarily meant for an actual roleplay environment, if you would like a real generalized roleplay plugin, please check out my plugin [here](https://github.com/z5tm/General-Roleplay-Plugin).**
